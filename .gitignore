@@ -1,0 +1,7 @@
+.gitcookies
+.idea
+.vscode/
+dist/
+builds/
+*.wasm
+/plugins-local

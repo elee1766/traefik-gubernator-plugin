@@ -1,0 +1,4 @@
+experimental:
+  localPlugins:
+    example:
+      moduleName: github.com/traefik/plugindemowasm

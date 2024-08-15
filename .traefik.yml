@@ -1,0 +1,10 @@
+displayName: Gubernator Plugin
+type: middleware
+iconPath: .assets/icon.png
+
+import: github.com/elee1766/traefik-gubernator-plugin
+
+summary: 'Gubernator Ratelimiter Plugin'
+
+testData:
+  remote: "noop"
