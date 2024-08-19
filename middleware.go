@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/valyala/fasttemplate"
+	"github.com/elee1766/traefik-gubernator-plugin/fasttemplate"
 )
 
 // CreateConfig creates the default plugin configuration.
