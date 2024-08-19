@@ -10,7 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elee1766/traefik-gubernator-plugin/fasttemplate"
+	// yaegi:tags appengine
+	"github.com/valyala/fasttemplate"
 )
 
 // CreateConfig creates the default plugin configuration.

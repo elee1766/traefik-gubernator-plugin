@@ -1,3 +1,5 @@
+// +build appengine
+
 package fasttemplate
 
 func unsafeBytes2String(b []byte) string {
