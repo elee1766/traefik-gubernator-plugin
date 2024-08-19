@@ -9,9 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	// yaegi:tags appengine
-	"github.com/valyala/fasttemplate"
 )
 
 // CreateConfig creates the default plugin configuration.
@@ -38,7 +35,7 @@ type GubernatorPlugin struct {
 
 type RequestWithTemplate struct {
 	config   RateLimitReq
-	template *fasttemplate.Template
+	template *Template
 }
 
 // New creates a new GubernatorPlugin plugin.
@@ -60,7 +57,7 @@ func New(_ context.Context, next http.Handler, config *Config, _ string) (http.H
 	g.client = c
 
 	for _, v := range config.Limits {
-		tmpl, err := fasttemplate.NewTemplate(v.UniqueKey, "{", "}")
+		tmpl, err := NewTemplate(v.UniqueKey, "{", "}")
 		if err != nil {
 			return nil, err
 		}

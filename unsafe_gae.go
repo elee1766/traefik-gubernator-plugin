@@ -1,6 +1,4 @@
-// +build appengine
-
-package fasttemplate
+package traefik_gubernator_plugin
 
 func unsafeBytes2String(b []byte) string {
 	return string(b)
