@@ -29,17 +29,6 @@ linters-settings:
 linters:
   enable-all: true
   disable:
-    - deadcode # deprecated
-    - exhaustivestruct # deprecated
-    - golint # deprecated
-    - ifshort # deprecated
-    - interfacer # deprecated
-    - maligned # deprecated
-    - nosnakecase # deprecated
-    - scopelint # deprecated
-    - scopelint # deprecated
-    - structcheck # deprecated
-    - varcheck # deprecated
     - sqlclosecheck # not relevant (SQL)
     - rowserrcheck # not relevant (SQL)
     - execinquery # not relevant (SQL)
@@ -53,23 +42,14 @@ linters:
     - wsl
     - exhaustive
     - exhaustruct
-    - goerr113
+    - err113
     - wrapcheck
-    - ifshort
     - noctx
     - lll
     - gomnd
     - forbidigo
     - varnamelen
+    - perfsprint
+    - mnd
+    - tagalign
 
-issues:
-  exclude-use-default: false
-  max-per-linter: 0
-  max-same-issues: 0
-  exclude: []
-  exclude-rules:
-    - path: (.+)_test.go
-      linters:
-        - goconst
-        - funlen
-        - godot
