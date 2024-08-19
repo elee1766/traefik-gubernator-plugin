@@ -1,3 +1,3 @@
 module github.com/elee1766/traefik-gubernator-plugin
 
-go 1.20
+go 1.21
