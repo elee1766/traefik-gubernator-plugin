@@ -59,4 +59,4 @@ linters:
     - unparam
     - godot
     - depguard
-
+    - stylecheck
