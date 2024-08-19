@@ -129,6 +129,8 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	cn()
 	if err != nil {
+		// TODO: allow to configure what happens when you fail to contact the ratelimit.
+		// probably we wait, fail, pass, and retry
 		os.Stdout.Write([]byte(fmt.Sprintf("rl request failed:%s \n", err)))
 		http.Error(w, "failed to contact rate limit", http.StatusTooManyRequests)
 		return
