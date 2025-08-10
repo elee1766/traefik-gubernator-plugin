@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -131,7 +131,7 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	cn()
 	if err != nil {
-		os.Stdout.Write([]byte(fmt.Sprintf("rl request failed:%s \n", err)))
+		log.Println("rl request failed", err)
 		http.Error(w, "failed to contact rate limit", 429)
 		return
 	}
@@ -139,7 +139,7 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// TODO: allow this to be configured
 		// early exit on any error
 		if len(v.Error) > 0 {
-			os.Stdout.Write([]byte(fmt.Sprintf("rl request errored: %s\n", v.Error)))
+			log.Println("rl request errored", v.Error)
 			http.Error(w, "try again later", 429)
 			return
 		}
@@ -159,9 +159,13 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			resetTime = 0
 		}
 		w.Header().Add("Ratelimit-Reset", strconv.Itoa(int(resetTime)))
-		remainingInt, _ := strconv.Atoi(v.Remaining)
-
-		if len(v.Error) > 0 || remainingInt < 1 {
+		remainingInt, err := strconv.Atoi(v.Remaining)
+		if err != nil {
+			log.Println("rl parsing limit failed", err)
+			http.Error(w, "try again later", 429)
+			return
+		}
+		if remainingInt < 1 {
 			// early exit on first error
 			http.Error(w, "no remaining?", 429)
 			return
