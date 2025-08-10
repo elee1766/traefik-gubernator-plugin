@@ -4,14 +4,12 @@
 // and strings.Replacer.
 //
 // Fasttemplate ideally fits for fast and simple placeholders' substitutions.
-package fasttemplate
+package traefik_gubernator_plugin
 
 import (
 	"bytes"
 	"fmt"
 	"io"
-
-	"github.com/valyala/bytebufferpool"
 )
 
 // ExecuteFunc calls f on each template tag (placeholder) occurrence.
@@ -65,9 +63,9 @@ func ExecuteFunc(template, startTag, endTag string, w io.Writer, f TagFunc) (int
 // values from the map m and writes the result to the given writer w.
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // Returns the number of bytes written to w.
 //
@@ -81,9 +79,9 @@ func Execute(template, startTag, endTag string, w io.Writer, m map[string]interf
 // This can be used as a drop-in replacement for strings.Replacer
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // Returns the number of bytes written to w.
 //
@@ -116,27 +114,21 @@ func ExecuteFuncStringWithErr(template, startTag, endTag string, f TagFunc) (str
 		return template, nil
 	}
 
-	bb := byteBufferPool.Get()
-	if _, err := ExecuteFunc(template, startTag, endTag, bb, f); err != nil {
-		bb.Reset()
-		byteBufferPool.Put(bb)
+	buf := bytes.NewBuffer(make([]byte, 0, 4096))
+	if _, err := ExecuteFunc(template, startTag, endTag, buf, f); err != nil {
 		return "", err
 	}
-	s := string(bb.B)
-	bb.Reset()
-	byteBufferPool.Put(bb)
+	s := string(buf.Bytes())
 	return s, nil
 }
-
-var byteBufferPool bytebufferpool.Pool
 
 // ExecuteString substitutes template tags (placeholders) with the corresponding
 // values from the map m and returns the result.
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // This function is optimized for constantly changing templates.
 // Use Template.ExecuteString for frozen templates.
@@ -148,9 +140,9 @@ func ExecuteString(template, startTag, endTag string, m map[string]interface{}) 
 // This can be used as a drop-in replacement for strings.Replacer
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // This function is optimized for constantly changing templates.
 // Use Template.ExecuteStringStd for frozen templates.
@@ -165,25 +157,8 @@ type Template struct {
 	startTag string
 	endTag   string
 
-	texts          [][]byte
-	tags           []string
-	byteBufferPool bytebufferpool.Pool
-}
-
-// New parses the given template using the given startTag and endTag
-// as tag start and tag end.
-//
-// The returned template can be executed by concurrently running goroutines
-// using Execute* methods.
-//
-// New panics if the given template cannot be parsed. Use NewTemplate instead
-// if template may contain errors.
-func New(template, startTag, endTag string) *Template {
-	t, err := NewTemplate(template, startTag, endTag)
-	if err != nil {
-		panic(err)
-	}
-	return t
+	texts [][]byte
+	tags  []string
 }
 
 // NewTemplate parses the given template using the given startTag and endTag
@@ -304,9 +279,9 @@ func (t *Template) ExecuteFunc(w io.Writer, f TagFunc) (int64, error) {
 // values from the map m and writes the result to the given writer w.
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // Returns the number of bytes written to w.
 func (t *Template) Execute(w io.Writer, m map[string]interface{}) (int64, error) {
@@ -317,9 +292,9 @@ func (t *Template) Execute(w io.Writer, m map[string]interface{}) (int64, error)
 // This can be used as a drop-in replacement for strings.Replacer
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // Returns the number of bytes written to w.
 func (t *Template) ExecuteStd(w io.Writer, m map[string]interface{}) (int64, error) {
@@ -349,15 +324,11 @@ func (t *Template) ExecuteFuncString(f TagFunc) string {
 // This function is optimized for frozen templates.
 // Use ExecuteFuncString for constantly changing templates.
 func (t *Template) ExecuteFuncStringWithErr(f TagFunc) (string, error) {
-	bb := t.byteBufferPool.Get()
+	bb := bytes.NewBuffer(make([]byte, 0, 4096))
 	if _, err := t.ExecuteFunc(bb, f); err != nil {
-		bb.Reset()
-		t.byteBufferPool.Put(bb)
 		return "", err
 	}
 	s := string(bb.Bytes())
-	bb.Reset()
-	t.byteBufferPool.Put(bb)
 	return s, nil
 }
 
@@ -365,9 +336,9 @@ func (t *Template) ExecuteFuncStringWithErr(f TagFunc) (string, error) {
 // values from the map m and returns the result.
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // This function is optimized for frozen templates.
 // Use ExecuteString for constantly changing templates.
@@ -379,9 +350,9 @@ func (t *Template) ExecuteString(m map[string]interface{}) string {
 // This can be used as a drop-in replacement for strings.Replacer
 //
 // Substitution map m may contain values with the following types:
-//   * []byte - the fastest value type
-//   * string - convenient value type
-//   * TagFunc - flexible value type
+//   - []byte - the fastest value type
+//   - string - convenient value type
+//   - TagFunc - flexible value type
 //
 // This function is optimized for frozen templates.
 // Use ExecuteStringStd for constantly changing templates.

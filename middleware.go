@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/valyala/fasttemplate"
 )
 
 // CreateConfig creates the default plugin configuration.
@@ -37,7 +35,7 @@ type GubernatorPlugin struct {
 
 type RequestWithTemplate struct {
 	config   RateLimitReq
-	template *fasttemplate.Template
+	template *Template
 }
 
 // New creates a new GubernatorPlugin plugin.
@@ -59,7 +57,7 @@ func New(_ context.Context, next http.Handler, config *Config, _ string) (http.H
 	g.client = c
 
 	for _, v := range config.Limits {
-		tmpl, err := fasttemplate.NewTemplate(v.UniqueKey, "{", "}")
+		tmpl, err := NewTemplate(v.UniqueKey, "{", "}")
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +130,7 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	cn()
 	if err != nil {
 		log.Println("rl request failed", err)
-		http.Error(w, "failed to contact rate limit", 429)
+		http.Error(w, "failed to contact rate limit", http.StatusTooManyRequests)
 		return
 	}
 	for idx, v := range ratelimitResponse.Responses {
@@ -162,12 +160,12 @@ func (a *GubernatorPlugin) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		remainingInt, err := strconv.Atoi(v.Remaining)
 		if err != nil {
 			log.Println("rl parsing limit failed", err)
-			http.Error(w, "try again later", 429)
+			http.Error(w, "try again later", http.StatusTooManyRequests)
 			return
 		}
 		if remainingInt < 1 {
 			// early exit on first error
-			http.Error(w, "no remaining?", 429)
+			http.Error(w, "no remaining?", http.StatusTooManyRequests)
 			return
 		}
 	}

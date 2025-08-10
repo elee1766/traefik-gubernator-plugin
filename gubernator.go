@@ -27,7 +27,6 @@ func newClient(conf *Config) (*gubernatorClient, error) {
 }
 
 func (c *gubernatorClient) GetRateLimits(ctx context.Context, req *GetRateLimitsReq) (*GetRateLimitsResp, error) {
-
 	bodyBytes, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
